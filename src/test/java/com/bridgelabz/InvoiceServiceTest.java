@@ -1,55 +1,61 @@
 package com.bridgelabz;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InvoiceServiceTest {
-
-    InvoiceGenerator invoiceGenerator = null;
-    @Before
-    public void setUp() throws Exception {
-        invoiceGenerator = new InvoiceGenerator();
-    }
-
-
+    InvoiceGenerator invoiceGenerator;
     @Test
-
-    public void givenDistanceAndTime_ShouldReturnTotalFare() {
-        double distance = 1.0;
-        int time = 10;
-        double fare = invoiceGenerator.calculateFare(distance, time);
-        assertEquals(20, fare, 0.0);
-    }
-
-
-    @Test
-
-    public void givenDistanceAndTime_WhenTotalFareLessThan10_ShouldReturnMinimumFare() {
-        double distance = 0.1;
-        int time = 1;
-        double fare = invoiceGenerator.calculateFare(distance, time);
-        assertEquals(5, fare, 0.0);
-    }
-
-
-    @Test
-    public void givenMultipleRidesShouldReturnRideSummary() {
-        Ride[] rides = {new Ride(2.0, 5), new Ride(0.1, 1)};
+    public void givenMultipleRide_ShouldReturnInvoiceSummary() {
+        Ride[] rides = {
+                new Ride(CategoryRide.REGULAR, 2, 5),
+                new Ride(CategoryRide.REGULAR, 0.1, 1)
+        };
         InvoiceSummary summary = invoiceGenerator.calculateFare(rides);
-        InvoiceSummary expectedSummary = new InvoiceSummary(2, 30.0);
-        assertEquals(expectedSummary, summary);
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(30, 2);
+        assertEquals(expectedInvoiceSummary, summary);
+    }
+
+    @Test
+    public void givenUserIDAndRides_ShouldReturnInvoiceSummary() {
+        Map<String, Ride[]> rideBook = new HashMap<>();
+        Ride[] rides = {
+                new Ride(CategoryRide.REGULAR, 2.0, 5),
+                new Ride(CategoryRide.REGULAR, 0.1, 1)
+        };
+        Ride[] rides1 = {
+                new Ride(CategoryRide.REGULAR, 3.0, 5),
+                new Ride(CategoryRide.REGULAR, 0.1, 1)
+        };
+        rideBook.put("ram", rides);
+        rideBook.put("kumar", rides1);
+        String userID = "ram";
+        InvoiceSummary summary = invoiceGenerator.calculateFare(userID, rideBook);
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(30, 2);
+        assertEquals(expectedInvoiceSummary, summary);
     }
 
 
     @Test
-    public void givenUserIdShouldReturnTheInvoice() {
-        String userId = "abc@123";
-        Ride[] rides = {new Ride(2.0, 5), new Ride(0.1, 1)};
-        invoiceGenerator.addRides(userId, rides);
-        InvoiceSummary summary = invoiceGenerator.getInvoiceSummary(userId);
-        InvoiceSummary checkSummary = new InvoiceSummary(2, 30.0);
-        assertEquals(summary, checkSummary);
+    public void givenNormalAndPremiumRideRate_ShouldReturnTotalFare() {
+        Map<String, Ride[]> rideBook = new HashMap<>();
+        Ride[] rides = {
+                new Ride(CategoryRide.PREMIUM, 2.0, 5),
+                new Ride(CategoryRide.REGULAR, 0.1, 1)
+        };
+        Ride[] rides1 = {
+                new Ride(CategoryRide.PREMIUM, 3.0, 5),
+                new Ride(CategoryRide.REGULAR, 0.1, 1)
+        };
+        rideBook.put("ram", rides);
+        rideBook.put("kumar", rides1);
+        String userID = "kumar";
+        InvoiceSummary summary = invoiceGenerator.calculateFare(userID, rideBook);
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(60, 2);
+        assertEquals(expectedInvoiceSummary, summary);
     }
 }
