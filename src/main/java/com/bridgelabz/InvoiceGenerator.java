@@ -11,7 +11,7 @@ public class InvoiceGenerator {
         double totalFare = distance * MINIMUM_COST_PER_KILOMETER + time * COST_PER_TIME;
         if (totalFare < MINIMUM_FARE)
             return MINIMUM_FARE;
-        return totalFare;
+        return totalFare; 
     }
 
 
